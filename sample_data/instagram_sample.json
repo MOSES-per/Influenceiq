@@ -1,0 +1,30 @@
+{
+  "profile_data": {
+    "username": "sample_instagram_creator",
+    "followers": 125000,
+    "following": 410,
+    "bio": "Fitness | Lifestyle | Public Figure",
+    "total_posts": 380,
+    "is_verified": false
+  },
+  "posts_data": [
+    {
+      "post_type": "image",
+      "likes": 5200,
+      "comments": 140,
+      "views": null
+    },
+    {
+      "post_type": "image",
+      "likes": 6100,
+      "comments": 160,
+      "views": null
+    },
+    {
+      "post_type": "image",
+      "likes": 4800,
+      "comments": 110,
+      "views": null
+    }
+  ]
+}
