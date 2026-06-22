@@ -40,6 +40,8 @@ The system is designed to be **ethical, platform-aware, and explainable**, prior
 
 ---
 
+Maintained by Moses Pereira
+
 ## Architecture Overview
 
 +------------------+
