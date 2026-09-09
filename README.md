@@ -104,41 +104,90 @@ Copy code
 
 ## Quick Start
 
-1. Create a virtual environment and install requirements:
-   ```bash
-   pip install -r requirements.txt
-Run the Streamlit dashboard:
+### 1. Open the project
 
-bash
-Copy code
-streamlit run dashboard/app.py
-Project Structure
-collector/ – Platform data acquisition modules
+```bash
+cd C:\Users\moses\influenceiq
+```
 
-analytics/ – Engagement, authenticity, NLP, confidence scoring
+### 2. Create the virtual environment (once)
 
-storage/ – Raw JSON and SQLite storage
+InfluenceIQ uses a Python virtual environment named `venv`. It isolates this project's Python packages from the system Python installation and other projects.
 
-scoring/ – Influencer Intelligence Score (IIS) engine
+```bash
+python -m venv venv
+```
 
-reports/ – CSV and PDF export logic
+### 3. Activate it (Windows)
 
-dashboard/ – Streamlit user interface
+```bash
+venv\Scripts\activate
+```
 
-main.py – Sample pipeline runner
+You should see `(venv)` at the beginning of the terminal prompt.
 
-Design Principles
-Explainability over black-box scoring
+### 4. Install dependencies
 
-Ethical handling of restricted platforms
+```bash
+pip install -r requirements.txt
+```
 
-Separation of concerns
+### 5. Start the dashboard
 
-Analytics-first, scraping-second
+From the project root, use:
 
-Notes
-Only public data is analyzed.
+```bash
+streamlit run influenceiq/dashboard/app.py
+```
 
-Instagram analysis is non-live by design.
+> **Important:** Do not use `streamlit run dashboard/app.py` from the project root.
 
-This project is intended for research, analytics, and evaluation, not surveillance.
+The dashboard normally runs at `http://localhost:8501`.
+
+### 6. Run the project later
+
+The environment only needs to be created once. On later runs:
+
+```bash
+cd C:\Users\moses\influenceiq
+venv\Scripts\activate
+streamlit run influenceiq/dashboard/app.py
+```
+
+### 7. Stop and deactivate
+
+Stop Streamlit with `Ctrl+C`, then optionally run:
+
+```bash
+deactivate
+```
+
+## Project Structure
+
+```text
+influenceiq/
+├── influenceiq/
+│   ├── collector/
+│   ├── analytics/
+│   ├── scoring/
+│   ├── reports/
+│   ├── storage/
+│   ├── dashboard/
+│   └── sample_data/
+├── requirements.txt
+├── README.md
+└── venv/
+```
+
+### Main components
+
+- `collector/` – platform data acquisition
+- `analytics/` – engagement, authenticity, and NLP analysis
+- `scoring/` – IIS calculation
+- `reports/` – CSV/PDF reporting
+- `storage/` – JSON and SQLite storage
+- `dashboard/` – Streamlit UI
+- `sample_data/` – Instagram sample data and CSV template
+- `requirements.txt` – Python dependencies
+- `venv/` – local Python virtual environment; normally not committed to Git
+
