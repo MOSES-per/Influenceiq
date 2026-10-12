@@ -1,4 +1,9 @@
+import os
 import random
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Basic request headers to look like a normal browser
 HEADERS = {
@@ -7,13 +12,21 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/120.0.0.0 Safari/537.36"
     ),
-    "Accept-Language": "en-US,en;q=0.9"
+    "Accept-Language": "en-US,en;q=0.9",
 }
 
 # Rate limiting (seconds)
 MIN_DELAY = 5
 MAX_DELAY = 8
 
+
 def get_random_delay():
     return random.uniform(MIN_DELAY, MAX_DELAY)
-YOUTUBE_API_KEY = "AIzaSyDUs7KEk_9jLS_JVScK7zS16sY53-BtEbk"
+
+
+# Secrets come from environment variables / a local .env file (never commit it)
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_EMBED_MODEL = os.getenv("GEMINI_EMBED_MODEL", "gemini-embedding-001")
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
