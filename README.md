@@ -1,193 +1,128 @@
 # InfluenceIQ
 
-InfluenceIQ is a cross-platform influencer intelligence engine that analyzes public social media data to compute **engagement quality, authenticity, content consistency, audience alignment**, and **platform confidence** — then combines these into an explainable **Influencer Intelligence Score (IIS)**.
+InfluenceIQ is an influencer intelligence engine. It analyzes public social media data and computes **engagement quality, authenticity, content consistency and audience alignment**, then combines them into an explainable **Influencer Intelligence Score (IIS)**.
 
-The system is designed to be **ethical, platform-aware, and explainable**, prioritizing analytics quality over aggressive data scraping.
+It now includes **Ask InfluenceIQ**, a chat agent that answers questions about creators by calling InfluenceIQ's scoring engine as tools, with a RAG search over the scoring methodology and creators' post titles.
 
----
-
-## Key Features
-
-- **Engagement Quality Score (EQS)**
-  - Follower-based and view-based engagement models
-- **Authenticity Analysis**
-  - Detects suspicious engagement patterns and bot-like behavior
-- **Audience & Content Intelligence**
-  - NLP-based niche detection and alignment scoring
-- **Platform Confidence Score**
-  - Quantifies reliability of platform data (YouTube > Reddit > Instagram)
-- **Influencer Intelligence Score (IIS)**
-  - Weighted, explainable final score with breakdown
-- **Compare Two Creators**
-  - Side-by-side comparison across all scores
-- **Interactive Dashboard**
-  - Expand / collapse report sections
-- **CSV & PDF Reports**
-  - Downloadable, shareable influencer reports
 
 ---
 
-## Supported Platforms
+## Features
 
-| Platform | Data Access | Confidence |
-|--------|------------|------------|
-| YouTube | Official API | High |
-| Reddit | Public JSON | Medium |
-| Instagram | Sample / CSV | Limited |
+- **Engagement Quality Score (EQS):** view-based (YouTube) and follower-based (Reddit, Instagram) engagement models
+- **Authenticity analysis:** heuristic detection of suspicious engagement patterns (not machine learning)
+- **Niche and audience alignment:** keyword-based NLP over bios and post titles
+- **Platform confidence:** reliability of each data source (YouTube > Reddit > Instagram)
+- **Influencer Intelligence Score (IIS):** weighted score with a breakdown and a verdict
+- **Compare two creators** side by side
+- **CSV and PDF reports**
+- **Ask InfluenceIQ (new):** an AI chat agent with tool calling and RAG
 
-> Instagram live scraping is intentionally restricted due to platform limitations.  
-> InfluenceIQ supports Instagram analysis via **sample datasets or uploaded CSV files** to ensure stability and ethical use.
+## Supported platforms
 
----
+| Platform  | Data access  | Confidence |
+|-----------|--------------|------------|
+| YouTube   | Official YouTube Data API | High |
+| Reddit    | Public JSON endpoints     | Medium |
+| Instagram | Sample data / CSV upload  | Limited |
 
-## Architecture Overview
-
-+------------------+
-
-Platform Collectors
-YouTube API
-Reddit JSON
-Instagram CSV
-+--------+---------+
-
-markdown
-Copy code
-     |
-     v
-+------------------+
-
-Analytics Layer
-Engagement (EQS)
-Authenticity
-NLP / Niche
-Confidence Score
-+--------+---------+
-
-markdown
-Copy code
-     |
-     v
-+------------------+
-
-Scoring Engine
-IIS Computation
-Score Breakdown
-+--------+---------+
-
-markdown
-Copy code
-     |
-     v
-+------------------+
-
-Streamlit UI
-Single / Compare
-Expandable Views
-Visual Analytics
-+--------+---------+
-
-markdown
-Copy code
-     |
-     v
-+------------------+
-
-Reports
-CSV Export
-PDF Export
-+------------------+
-
-yaml
-Copy code
+Instagram live scraping is intentionally not supported. Instagram analysis uses sample datasets or uploaded CSV files.
 
 ---
 
-## Quick Start
+## Ask InfluenceIQ (AI agent)
 
-### 1. Open the project
+A chat page in the Streamlit app. The LLM decides which tool to call, the code runs it, and the result goes back to the model until it can answer.
 
-```bash
-cd C:\Users\moses\influenceiq
+```mermaid
+flowchart LR
+    U[User question] --> G[Input guard]
+    G --> L[LLM: Gemini]
+    L -->|tool call| T[Tools]
+    T --> L
+    L --> A[Answer]
+    T --> S[(analytics + scoring)]
+    T --> V[(RAG vector store)]
 ```
 
-### 2. Create the virtual environment (once)
+| Tool | What it does |
+|---|---|
+| `analyze_creator` | Collects public YouTube/Reddit data and runs engagement, authenticity, niche and IIS scoring |
+| `compare_creators` | Analyzes two creators and compares them |
+| `search_knowledge` | RAG: embedding search over the scoring methodology and analyzed creators' post titles |
 
-InfluenceIQ uses a Python virtual environment named `venv`. It isolates this project's Python packages from the system Python installation and other projects.
+**RAG:** documents are embedded with Gemini embeddings and stored in an in-memory vector store using cosine similarity (NumPy). Post titles are indexed when a creator is analyzed.
 
-```bash
+**Safeguards**
+- Input length limit and blocking of obvious prompt-injection phrases
+- Third-party text (bios, post titles) is sanitized and treated as data
+- Emails, phone numbers and API-key-like strings are redacted
+- Tool arguments are validated, and tool errors never crash the loop
+- Step and tool-call limits, retries on rate limits and overload, cached creator data
+
+**Example questions**
+- `Analyze the YouTube channel MKBHD`
+- `Compare YouTube creators MKBHD and Linus Tech Tips. Who is safer to partner with?`
+- `How is the Authenticity Index calculated?`
+- `What topics does MKBHD post about?`
+
+**Limits:** only post titles and public counts are collected (no comment text). The authenticity index is a heuristic, not proof of fake followers. On the free Gemini tier, requests can hit rate limits.
+
+---
+
+## Quick start
+
+### 1. Create a virtual environment and install dependencies
+```
 python -m venv venv
-```
-
-### 3. Activate it (Windows)
-
-```bash
 venv\Scripts\activate
-```
-
-You should see `(venv)` at the beginning of the terminal prompt.
-
-### 4. Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-### 5. Start the dashboard
-
-From the project root, use:
-
-```bash
-streamlit run influenceiq/dashboard/app.py
+### 2. Add your API keys
+Copy `.env.example` to `.env` and fill it in:
 ```
-
-> **Important:** Do not use `streamlit run dashboard/app.py` from the project root.
-
-The dashboard normally runs at `http://localhost:8501`.
-
-### 6. Run the project later
-
-The environment only needs to be created once. On later runs:
-
-```bash
-cd C:\Users\moses\influenceiq
-venv\Scripts\activate
-streamlit run influenceiq/dashboard/app.py
+GEMINI_API_KEY=your_gemini_key
+YOUTUBE_API_KEY=your_youtube_data_api_key
 ```
+- Gemini key: https://aistudio.google.com/apikey
+- YouTube key: create an API key in Google Cloud and enable **YouTube Data API v3**
 
-### 7. Stop and deactivate
+Optional: set `GEMINI_MODEL` or `GEMINI_EMBED_MODEL` in `.env` if the default model names are unavailable.
 
-Stop Streamlit with `Ctrl+C`, then optionally run:
-
-```bash
-deactivate
+### 3. Run the dashboard
 ```
+python -m streamlit run influenceiq/dashboard/app.py
+```
+Open `http://localhost:8501`. Use the sidebar to switch between the analysis dashboard and **Ask InfluenceIQ**.
 
-## Project Structure
+### 4. Run the tests
+```
+python -m pytest
+```
+The tests run offline with a fake LLM, so they need no API keys.
 
-```text
+---
+
+## Project structure
+
+```
 influenceiq/
 ├── influenceiq/
-│   ├── collector/
-│   ├── analytics/
-│   ├── scoring/
-│   ├── reports/
-│   ├── storage/
-│   ├── dashboard/
-│   └── sample_data/
+│   ├── agent/         # Ask InfluenceIQ: agent loop, tools, RAG, guardrails, LLM client
+│   ├── collector/     # YouTube, Reddit, Instagram data collection
+│   ├── analytics/     # engagement, authenticity, NLP / niche
+│   ├── scoring/       # IIS computation
+│   ├── reports/       # CSV / PDF export
+│   ├── storage/       # JSON and SQLite storage
+│   ├── dashboard/     # Streamlit app (+ pages/ for the chat)
+│   └── config/        # settings (reads keys from .env)
+├── sample_data/       # Instagram sample data and CSV template
+├── tests/             # offline tests for the agent
+├── .env.example
 ├── requirements.txt
-├── README.md
-└── venv/
+└── README.md
 ```
 
-### Main components
-
-- `collector/` – platform data acquisition
-- `analytics/` – engagement, authenticity, and NLP analysis
-- `scoring/` – IIS calculation
-- `reports/` – CSV/PDF reporting
-- `storage/` – JSON and SQLite storage
-- `dashboard/` – Streamlit UI
-- `sample_data/` – Instagram sample data and CSV template
-- `requirements.txt` – Python dependencies
-- `venv/` – local Python virtual environment; normally not committed to Git
-
+## Tech stack
+Python, Streamlit, Pandas, NumPy, YouTube Data API, Reddit public API, Gemini (OpenAI-compatible API), pytest
