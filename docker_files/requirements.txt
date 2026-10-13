@@ -1,0 +1,11 @@
+requests
+numpy
+pandas
+streamlit
+matplotlib
+reportlab
+google-api-python-client
+openai
+python-dotenv
+pytest
+httpx

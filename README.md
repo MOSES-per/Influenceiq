@@ -4,6 +4,7 @@ InfluenceIQ is an influencer intelligence engine. It analyzes public social medi
 
 It now includes **Ask InfluenceIQ**, a chat agent that answers questions about creators by calling InfluenceIQ's scoring engine as tools, with a RAG search over the scoring methodology and creators' post titles.
 
+**Demo video:** [DEMO_LINK]
 
 ---
 
@@ -96,6 +97,17 @@ python -m streamlit run influenceiq/dashboard/app.py
 ```
 Open `http://localhost:8501`. Use the sidebar to switch between the analysis dashboard and **Ask InfluenceIQ**.
 
+### Run with Docker
+```
+docker build -t influenceiq .
+docker run --rm -p 8501:8501 --env-file .env influenceiq
+```
+Or with Docker Compose:
+```
+docker compose up --build
+```
+Open `http://localhost:8501`. The `.env` file is passed in at run time and is never copied into the image.
+
 ### 4. Run the tests
 ```
 python -m pytest
@@ -119,10 +131,12 @@ influenceiq/
 │   └── config/        # settings (reads keys from .env)
 ├── sample_data/       # Instagram sample data and CSV template
 ├── tests/             # offline tests for the agent
+├── Dockerfile
+├── docker-compose.yml
 ├── .env.example
 ├── requirements.txt
 └── README.md
 ```
 
 ## Tech stack
-Python, Streamlit, Pandas, NumPy, YouTube Data API, Reddit public API, Gemini (OpenAI-compatible API), pytest
+Python, Streamlit, Pandas, NumPy, YouTube Data API, Reddit public API, Gemini (OpenAI-compatible API), pytest, Docker
